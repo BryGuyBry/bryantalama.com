@@ -1,1 +1,619 @@
-<h1>Bryant Alama</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BRYANT ALAMA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --amber: #ffb347;
+      --orange: #ff6b00;
+      --red-neon: #ff2200;
+      --darker: #080300;
+      --text-dim: #a05a20;
+      --glow-amber: 0 0 10px #ffb347, 0 0 30px #ff6b00, 0 0 60px #ff2200;
+      --glow-soft: 0 0 8px #ffb34788, 0 0 20px #ff6b0055;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow-x: hidden; }
+
+    body {
+      background-color: var(--darker);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      cursor: crosshair;
+    }
+
+    #starfield { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,179,71,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,179,71,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+    .scanlines {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px);
+    }
+    .vignette {
+      position: fixed; inset: 0; z-index: 3; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.75) 100%);
+    }
+
+    #glitch-overlay {
+      position: fixed; inset: 0; z-index: 1000;
+      pointer-events: none; opacity: 0;
+      background: var(--orange);
+      mix-blend-mode: screen;
+    }
+
+    .site-wrapper {
+      position: relative; z-index: 10;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: space-between;
+      padding: 3rem 2rem 2rem;
+    }
+
+    header {
+      text-align: center;
+      opacity: 0; animation: fadeDown 1s ease forwards 0.3s;
+    }
+    .site-title {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(2rem, 6vw, 4.5rem);
+      letter-spacing: 0.3em; color: var(--amber);
+      text-shadow: var(--glow-amber);
+    }
+    .site-subtitle {
+      font-size: clamp(0.65rem, 1.5vw, 0.85rem);
+      letter-spacing: 0.4em; color: var(--text-dim);
+      margin-top: 0.6rem; text-transform: uppercase;
+    }
+    .title-line {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, var(--orange), transparent);
+      margin-top: 1rem; box-shadow: 0 0 8px var(--orange);
+    }
+
+    /* ── PORTALS ── */
+    .portals {
+      display: flex; flex-direction: row;
+      gap: 2rem; width: 100%; max-width: 1100px;
+      flex: 1; justify-content: center; align-items: center;
+      padding: 2rem 0;
+    }
+
+    .portal {
+      position: relative;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      flex: 1; min-height: 360px;
+      border: 1px solid rgba(255,107,0,0.25);
+      background: rgba(12,5,0,0.7);
+      cursor: crosshair; text-decoration: none;
+      overflow: hidden; padding: 2rem 1.5rem;
+      opacity: 0;
+      transition: border-color 0.4s ease, box-shadow 0.4s ease, background 0.4s ease, transform 0.3s ease;
+    }
+
+    .portal:nth-child(1) { animation: fadeUp 0.9s cubic-bezier(0.23,1,0.32,1) forwards 0.7s; }
+    .portal:nth-child(2) { animation: fadeUp 0.9s cubic-bezier(0.23,1,0.32,1) forwards 1.0s; }
+    .portal:nth-child(3) { animation: fadeUp 0.9s cubic-bezier(0.23,1,0.32,1) forwards 1.3s; }
+
+    .portal::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse at center, rgba(255,107,0,0.07) 0%, transparent 70%);
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .portal:hover::before { opacity: 1; }
+    .portal:hover {
+      border-color: var(--amber);
+      box-shadow: var(--glow-soft), inset 0 0 40px rgba(255,107,0,0.06);
+      background: rgba(20,8,0,0.9);
+      transform: translateY(-6px);
+    }
+
+    .portal::after {
+      content: ''; position: absolute; top: 0; left: 0;
+      width: 20px; height: 20px;
+      border-top: 1px solid var(--orange); border-left: 1px solid var(--orange);
+      opacity: 0.4; transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+    }
+    .portal:hover::after { opacity: 1; width: 30px; height: 30px; }
+
+    .corner-br {
+      position: absolute; bottom: 0; right: 0;
+      width: 20px; height: 20px;
+      border-bottom: 1px solid var(--orange); border-right: 1px solid var(--orange);
+      opacity: 0.4; transition: opacity 0.3s ease, width 0.3s ease, height 0.3s ease;
+    }
+    .portal:hover .corner-br { opacity: 1; width: 30px; height: 30px; }
+
+    .portal-art { width: 160px; height: 160px; margin-bottom: 1.5rem; flex-shrink: 0; }
+    .portal-art svg { width: 100%; height: 100%; overflow: visible; }
+
+    .portal-label {
+      font-family: 'Orbitron', sans-serif; font-weight: 900;
+      font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+      letter-spacing: 0.3em; color: var(--amber);
+      text-shadow: var(--glow-soft); text-align: center;
+      transition: text-shadow 0.3s ease;
+    }
+    .portal:hover .portal-label { text-shadow: var(--glow-amber); }
+
+    .portal-desc {
+      font-size: 0.72rem; color: var(--text-dim);
+      letter-spacing: 0.08em; text-align: center;
+      max-height: 0; overflow: hidden; opacity: 0; margin-top: 0;
+      transition: max-height 0.5s ease, opacity 0.5s ease, margin-top 0.4s ease;
+      line-height: 1.6; padding: 0 0.5rem;
+    }
+    .portal:hover .portal-desc { max-height: 4rem; opacity: 1; margin-top: 0.7rem; }
+
+    /* ── TAPE REEL ANIMATIONS ── */
+    .reel-left { transform-origin: 52px 72px; }
+    .reel-right { transform-origin: 108px 72px; }
+    .portal:hover .reel-left { animation: spinReel 2s linear infinite; }
+    .portal:hover .reel-right { animation: spinReel 2s linear infinite reverse; }
+    @keyframes spinReel {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+    .vu-bar { transform-origin: bottom; }
+    .portal:hover .vu-bar { animation: vuMeter 0.4s ease infinite alternate; }
+    .portal:hover .vu-bar:nth-child(2) { animation-delay: 0.1s; }
+    .portal:hover .vu-bar:nth-child(3) { animation-delay: 0.2s; }
+    .portal:hover .vu-bar:nth-child(4) { animation-delay: 0.05s; }
+    @keyframes vuMeter { from { transform: scaleY(0.3); } to { transform: scaleY(1); } }
+    .tape-line { stroke-dasharray: 4 4; }
+    .portal:hover .tape-line { animation: tapeMove 0.5s linear infinite; }
+    @keyframes tapeMove { from { stroke-dashoffset: 0; } to { stroke-dashoffset: -8; } }
+
+    /* ── BOOK ANIMATIONS ── */
+    .book-pages-left,
+    .book-pages-right,
+    .book-inner-glow { opacity: 0; transition: opacity 0.4s ease; }
+
+    .book-cover-left {
+      transform-origin: 80px 86px;
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+    }
+    .book-cover-right {
+      transform-origin: 80px 86px;
+      transition: transform 0.5s cubic-bezier(0.23,1,0.32,1);
+    }
+
+    .portal:hover .book-cover-left { transform: rotateY(-35deg) skewY(2deg); }
+    .portal:hover .book-cover-right { transform: rotateY(35deg) skewY(-2deg); }
+    .portal:hover .book-pages-left { opacity: 1; }
+    .portal:hover .book-pages-right { opacity: 1; transition-delay: 0.1s; }
+    .portal:hover .book-inner-glow { opacity: 1; transition-delay: 0.15s; }
+
+    .ms-line { stroke-dasharray: 60; stroke-dashoffset: 60; }
+    .portal:hover .ms-line {
+      animation: drawLine 0.6s ease forwards;
+    }
+    .portal:hover .ms-line:nth-child(2)  { animation-delay: 0.05s; }
+    .portal:hover .ms-line:nth-child(3)  { animation-delay: 0.10s; }
+    .portal:hover .ms-line:nth-child(4)  { animation-delay: 0.15s; }
+    .portal:hover .ms-line:nth-child(5)  { animation-delay: 0.20s; }
+    .portal:hover .ms-line:nth-child(6)  { animation-delay: 0.25s; }
+    .portal:hover .ms-line:nth-child(7)  { animation-delay: 0.30s; }
+    .portal:hover .ms-line:nth-child(8)  { animation-delay: 0.35s; }
+    .portal:hover .ms-line:nth-child(9)  { animation-delay: 0.40s; }
+    .portal:hover .ms-line:nth-child(10) { animation-delay: 0.45s; }
+    .portal:hover .ms-line:nth-child(11) { animation-delay: 0.50s; }
+    .portal:hover .ms-line:nth-child(12) { animation-delay: 0.55s; }
+    @keyframes drawLine {
+      from { stroke-dashoffset: 60; }
+      to   { stroke-dashoffset: 0; }
+    }
+
+
+    .scroll-glow { opacity: 0; transition: opacity 0.4s ease; }
+    .portal:hover .scroll-glow { opacity: 1; }
+    .rune { opacity: 0; transition: opacity 0.3s ease; }
+    .portal:hover .rune { opacity: 1; }
+    .portal:hover .rune:nth-child(1) { animation: runeFlicker 1.2s ease infinite; }
+    .portal:hover .rune:nth-child(2) { animation: runeFlicker 1.5s ease infinite 0.3s; }
+    .portal:hover .rune:nth-child(3) { animation: runeFlicker 1.8s ease infinite 0.6s; }
+    @keyframes runeFlicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+    .cloak-shimmer { opacity: 0; transition: opacity 0.5s ease; }
+    .portal:hover .cloak-shimmer { opacity: 0.12; animation: shimmer 2s ease infinite; }
+    @keyframes shimmer { 0%, 100% { opacity: 0.06; } 50% { opacity: 0.18; } }
+    .pen-line { stroke-dasharray: 30; stroke-dashoffset: 30; }
+    .portal:hover .pen-line { animation: writeLine 1.2s ease infinite; }
+    @keyframes writeLine {
+      0% { stroke-dashoffset: 30; opacity: 1; }
+      80% { stroke-dashoffset: 0; opacity: 1; }
+      100% { stroke-dashoffset: 0; opacity: 0; }
+    }
+
+    /* ── COMPUTER ANIMATIONS ── */
+    .screen-flicker { }
+    .portal:hover .screen-flicker { animation: screenFlicker 3s ease infinite; }
+    @keyframes screenFlicker {
+      0%, 94%, 100% { opacity: 1; }
+      95% { opacity: 0.3; }
+      96% { opacity: 1; }
+      97.5% { opacity: 0.5; }
+    }
+    .cursor-blink { opacity: 0; }
+    .portal:hover .cursor-blink { animation: blink 0.8s step-end infinite; }
+    @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+    .code-line { opacity: 0; }
+    .portal:hover .code-line:nth-child(1) { animation: codeFade 2.4s ease infinite 0s; }
+    .portal:hover .code-line:nth-child(2) { animation: codeFade 2.4s ease infinite 0.5s; }
+    .portal:hover .code-line:nth-child(3) { animation: codeFade 2.4s ease infinite 1.0s; }
+    .portal:hover .code-line:nth-child(4) { animation: codeFade 2.4s ease infinite 1.5s; }
+    @keyframes codeFade {
+      0% { opacity: 0; } 15%, 75% { opacity: 0.9; } 100% { opacity: 0; }
+    }
+    .disk-spin { transform-origin: 80px 148px; }
+    .portal:hover .disk-spin { animation: diskRotate 4s linear infinite; }
+    @keyframes diskRotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      opacity: 0; animation: fadeUp 1s ease forwards 1.8s; width: 100%;
+    }
+    .footer-line {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,107,0,0.4), transparent);
+      margin-bottom: 1.2rem;
+    }
+    .social-links { display: flex; justify-content: center; gap: 2rem; margin-bottom: 0.8rem; flex-wrap: wrap; }
+    .social-links a {
+      font-size: 0.75rem; letter-spacing: 0.2em; color: var(--text-dim);
+      text-decoration: none; text-transform: uppercase;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    .social-links a:hover { color: var(--amber); text-shadow: var(--glow-soft); }
+    .copyright { font-size: 0.65rem; color: rgba(160,90,32,0.4); letter-spacing: 0.3em; text-transform: uppercase; }
+
+    @keyframes fadeDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .portals { flex-direction: column; gap: 1.2rem; max-width: 420px; }
+      .portal {
+        min-height: 200px; flex-direction: row;
+        padding: 1.5rem; gap: 1.5rem;
+        justify-content: flex-start; align-items: center;
+      }
+      .portal-art { width: 90px; height: 90px; margin-bottom: 0; flex-shrink: 0; }
+      .portal-label { font-size: 1.4rem; text-align: left; }
+      .portal-desc { text-align: left; }
+      .portal:hover { transform: translateX(6px) translateY(0); }
+    }
+    @media (max-width: 480px) {
+      .site-wrapper { padding: 2rem 1rem 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="starfield"></canvas>
+  <div class="grid-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+  <div id="glitch-overlay"></div>
+
+  <div class="site-wrapper">
+
+    <header>
+      <h1 class="site-title">Bryant Alama</h1>
+      <p class="site-subtitle">Writer &nbsp;·&nbsp; Musician &nbsp;·&nbsp; Techno Wizard</p>
+      <div class="title-line"></div>
+    </header>
+
+    <nav class="portals">
+
+      <!-- ══ MUSIC PORTAL ══ -->
+      <a href="music.html" class="portal" data-dest="music.html">
+        <div class="corner-br"></div>
+        <div class="portal-art">
+          <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="10" y="45" width="140" height="95" rx="4" fill="#1a0800" stroke="#ff6b00" stroke-width="1.5"/>
+            <rect x="10" y="45" width="140" height="18" rx="4" fill="#0f0400" stroke="#ff6b00" stroke-width="1"/>
+            <rect x="18" y="50" width="45" height="7" rx="1" fill="none" stroke="rgba(255,179,71,0.3)" stroke-width="0.5"/>
+            <line x1="20" y1="54" x2="57" y2="54" stroke="#ff6b00" stroke-width="0.5" opacity="0.5"/>
+            <text x="68" y="56" font-family="Share Tech Mono" font-size="5" fill="rgba(255,179,71,0.4)">TASCAM</text>
+            <!-- Left reel -->
+            <g class="reel-left">
+              <circle cx="52" cy="70" r="20" fill="#0d0400" stroke="#ff6b00" stroke-width="1.5"/>
+              <circle cx="52" cy="70" r="12" fill="#1a0800" stroke="#ffb347" stroke-width="1"/>
+              <circle cx="52" cy="70" r="4" fill="#ff6b00"/>
+              <line x1="52" y1="58" x2="52" y2="82" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+              <line x1="40" y1="70" x2="64" y2="70" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+              <line x1="43.5" y1="61.5" x2="60.5" y2="78.5" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+              <line x1="60.5" y1="61.5" x2="43.5" y2="78.5" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+            </g>
+            <!-- Right reel -->
+            <g class="reel-right">
+              <circle cx="108" cy="70" r="20" fill="#0d0400" stroke="#ff6b00" stroke-width="1.5"/>
+              <circle cx="108" cy="70" r="12" fill="#1a0800" stroke="#ffb347" stroke-width="1"/>
+              <circle cx="108" cy="70" r="4" fill="#ff6b00"/>
+              <line x1="108" y1="58" x2="108" y2="82" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+              <line x1="96" y1="70" x2="120" y2="70" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+              <line x1="99.5" y1="61.5" x2="116.5" y2="78.5" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+              <line x1="116.5" y1="61.5" x2="99.5" y2="78.5" stroke="#ffb347" stroke-width="1" opacity="0.6"/>
+            </g>
+            <!-- Tape path -->
+            <path class="tape-line" d="M 52 90 Q 52 96 62 96 L 98 96 Q 108 96 108 90" stroke="#ffb347" stroke-width="1.5" fill="none"/>
+            <!-- Tape head -->
+            <rect x="73" y="91" width="14" height="8" rx="1" fill="#ff6b00" opacity="0.8"/>
+            <!-- VU Meter -->
+            <g transform="translate(15,103)">
+              <rect x="0" y="0" width="32" height="22" rx="2" fill="#0a0300" stroke="rgba(255,107,0,0.4)" stroke-width="0.5"/>
+              <rect class="vu-bar" x="3" y="14" width="4" height="6" fill="#ff2200"/>
+              <rect class="vu-bar" x="9" y="10" width="4" height="10" fill="#ff6b00"/>
+              <rect class="vu-bar" x="15" y="7" width="4" height="13" fill="#ffb347"/>
+              <rect class="vu-bar" x="21" y="11" width="4" height="9" fill="#ff6b00"/>
+            </g>
+            <!-- Buttons -->
+            <rect x="56" y="106" width="10" height="6" rx="1" fill="#ff2200" opacity="0.8"/>
+            <rect x="70" y="106" width="10" height="6" rx="1" fill="#ffb347" opacity="0.8"/>
+            <rect x="84" y="106" width="10" height="6" rx="1" fill="#ff6b00" opacity="0.8"/>
+            <rect x="98" y="106" width="10" height="6" rx="1" fill="#ff6b00" opacity="0.8"/>
+            <rect x="112" y="106" width="24" height="6" rx="1" fill="#ff2200" opacity="0.9"/>
+            <!-- Faders -->
+            <line x1="56" y1="123" x2="136" y2="123" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+            <rect x="68" y="118" width="5" height="10" rx="1" fill="#ffb347" opacity="0.8"/>
+            <rect x="90" y="121" width="5" height="10" rx="1" fill="#ffb347" opacity="0.8"/>
+            <rect x="112" y="119" width="5" height="10" rx="1" fill="#ffb347" opacity="0.8"/>
+            <line x1="56" y1="131" x2="136" y2="131" stroke="rgba(255,107,0,0.2)" stroke-width="1"/>
+          </svg>
+        </div>
+        <span class="portal-label">Music</span>
+        <span class="portal-desc">Releases, Recordings, Videos</span>
+      </a>
+
+      <!-- ══ WRITING PORTAL ══ -->
+      <a href="writing.html" class="portal" data-dest="writing.html">
+        <div class="corner-br"></div>
+        <div class="portal-art">
+          <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" class="book-svg">
+            <defs>
+              <filter id="bookGlow">
+                <feGaussianBlur stdDeviation="2" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+
+            <!-- CLOSED STATE: spine and cover visible at rest -->
+
+            <!-- Book shadow / base -->
+            <ellipse cx="80" cy="148" rx="52" ry="6" fill="rgba(255,107,0,0.08)"/>
+
+            <!-- LEFT COVER (closed, rotates open on hover) -->
+            <g class="book-cover-left">
+              <!-- Left page/cover -->
+              <rect x="18" y="30" width="62" height="112" rx="3" fill="#1a0600" stroke="#ff6b00" stroke-width="1.5"/>
+              <!-- Cover texture lines -->
+              <line x1="24" y1="45" x2="74" y2="45" stroke="rgba(255,107,0,0.2)" stroke-width="0.5"/>
+              <line x1="24" y1="52" x2="74" y2="52" stroke="rgba(255,107,0,0.2)" stroke-width="0.5"/>
+              <line x1="24" y1="59" x2="74" y2="59" stroke="rgba(255,107,0,0.2)" stroke-width="0.5"/>
+              <!-- Decorative border on cover -->
+              <rect x="22" y="34" width="54" height="104" rx="2" fill="none" stroke="rgba(255,179,71,0.2)" stroke-width="0.8"/>
+              <!-- Title area ornament -->
+              <rect x="28" y="55" width="42" height="30" rx="1" fill="none" stroke="rgba(255,179,71,0.25)" stroke-width="0.8"/>
+              <line x1="35" y1="65" x2="63" y2="65" stroke="rgba(255,179,71,0.3)" stroke-width="0.7"/>
+              <line x1="35" y1="71" x2="63" y2="71" stroke="rgba(255,179,71,0.3)" stroke-width="0.7"/>
+              <line x1="35" y1="77" x2="55" y2="77" stroke="rgba(255,179,71,0.3)" stroke-width="0.7"/>
+              <!-- Corner flourishes -->
+              <path d="M 24 36 L 30 36 L 30 42" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+              <path d="M 74 36 L 68 36 L 68 42" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+              <path d="M 24 136 L 30 136 L 30 130" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+              <path d="M 74 136 L 68 136 L 68 130" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+            </g>
+
+            <!-- RIGHT COVER -->
+            <g class="book-cover-right">
+              <rect x="80" y="30" width="62" height="112" rx="3" fill="#1a0600" stroke="#ff6b00" stroke-width="1.5"/>
+              <rect x="84" y="34" width="54" height="104" rx="2" fill="none" stroke="rgba(255,179,71,0.2)" stroke-width="0.8"/>
+              <line x1="86" y1="45" x2="136" y2="45" stroke="rgba(255,107,0,0.2)" stroke-width="0.5"/>
+              <line x1="86" y1="52" x2="136" y2="52" stroke="rgba(255,107,0,0.2)" stroke-width="0.5"/>
+              <line x1="86" y1="59" x2="136" y2="59" stroke="rgba(255,107,0,0.2)" stroke-width="0.5"/>
+              <path d="M 86 36 L 92 36 L 92 42" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+              <path d="M 136 36 L 130 36 L 130 42" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+              <path d="M 86 136 L 92 136 L 92 130" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+              <path d="M 136 136 L 130 136 L 130 130" fill="none" stroke="#ff6b00" stroke-width="0.8" opacity="0.6"/>
+            </g>
+
+            <!-- SPINE -->
+            <rect x="76" y="28" width="8" height="116" rx="2" fill="#0d0300" stroke="#ff6b00" stroke-width="1.2"/>
+            <line x1="80" y1="32" x2="80" y2="140" stroke="rgba(255,179,71,0.15)" stroke-width="0.5"/>
+
+            <!-- INNER PAGES — revealed on hover -->
+            <!-- Left page interior (manuscript lines) -->
+            <g class="book-pages-left">
+              <rect x="20" y="32" width="58" height="108" rx="2" fill="#0f0400"/>
+              <!-- Aged page color -->
+              <rect x="20" y="32" width="58" height="108" rx="2" fill="rgba(255,179,71,0.04)"/>
+              <!-- Manuscript handwritten lines -->
+              <line class="ms-line" x1="26" y1="48" x2="72" y2="46" stroke="rgba(255,179,71,0.35)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="55" x2="70" y2="54" stroke="rgba(255,179,71,0.3)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="62" x2="73" y2="61" stroke="rgba(255,179,71,0.35)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="69" x2="68" y2="68" stroke="rgba(255,179,71,0.28)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="76" x2="72" y2="75" stroke="rgba(255,179,71,0.32)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="83" x2="65" y2="82" stroke="rgba(255,179,71,0.25)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="90" x2="72" y2="89" stroke="rgba(255,179,71,0.35)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="97" x2="70" y2="96" stroke="rgba(255,179,71,0.3)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="104" x2="73" y2="103" stroke="rgba(255,179,71,0.32)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="111" x2="67" y2="110" stroke="rgba(255,179,71,0.28)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="118" x2="72" y2="117" stroke="rgba(255,179,71,0.3)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="26" y1="125" x2="60" y2="124" stroke="rgba(255,179,71,0.22)" stroke-width="0.7" stroke-linecap="round"/>
+              <!-- Drop cap / initial letter suggestion -->
+              <rect x="26" y="36" width="8" height="8" rx="0.5" fill="none" stroke="rgba(255,107,0,0.4)" stroke-width="0.8"/>
+              <!-- Active writing line with pen effect -->
+              <line class="pen-line" x1="26" y1="132" x2="68" y2="131" stroke="#ffb347" stroke-width="1" stroke-linecap="round"/>
+            </g>
+
+            <!-- Right page interior -->
+            <g class="book-pages-right">
+              <rect x="82" y="32" width="58" height="108" rx="2" fill="#0f0400"/>
+              <rect x="82" y="32" width="58" height="108" rx="2" fill="rgba(255,179,71,0.03)"/>
+              <!-- Manuscript lines right page -->
+              <line class="ms-line" x1="88" y1="48" x2="134" y2="47" stroke="rgba(255,179,71,0.32)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="55" x2="132" y2="54" stroke="rgba(255,179,71,0.28)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="62" x2="135" y2="61" stroke="rgba(255,179,71,0.33)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="69" x2="130" y2="68" stroke="rgba(255,179,71,0.27)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="76" x2="134" y2="75" stroke="rgba(255,179,71,0.3)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="83" x2="128" y2="82" stroke="rgba(255,179,71,0.25)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="90" x2="134" y2="89" stroke="rgba(255,179,71,0.32)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="97" x2="131" y2="96" stroke="rgba(255,179,71,0.28)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="104" x2="135" y2="103" stroke="rgba(255,179,71,0.3)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="111" x2="129" y2="110" stroke="rgba(255,179,71,0.25)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="118" x2="134" y2="117" stroke="rgba(255,179,71,0.28)" stroke-width="0.8" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="125" x2="122" y2="124" stroke="rgba(255,179,71,0.22)" stroke-width="0.7" stroke-linecap="round"/>
+              <line class="ms-line" x1="88" y1="132" x2="134" y2="131" stroke="rgba(255,179,71,0.28)" stroke-width="0.8" stroke-linecap="round"/>
+            </g>
+
+            <!-- Glow from open pages -->
+            <rect class="book-inner-glow" x="20" y="32" width="120" height="108" rx="2" fill="rgba(255,107,0,0.06)" opacity="0"/>
+          </svg>
+        </div>
+        <span class="portal-label">Writing</span>
+        <span class="portal-desc">Blog, Fiction, Reviews</span>
+      </a>
+
+      <!-- ══ TECHNOLOGY PORTAL ══ -->
+      <a href="technology.html" class="portal" data-dest="technology.html">
+        <div class="corner-br"></div>
+        <div class="portal-art">
+          <svg viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="screenScanlines" x="0" y="0" width="2" height="4" patternUnits="userSpaceOnUse">
+                <rect x="0" y="0" width="2" height="2" fill="rgba(0,0,0,0.3)"/>
+              </pattern>
+            </defs>
+            <!-- Monitor -->
+            <rect x="12" y="18" width="136" height="98" rx="4" fill="#0d0400" stroke="#ff6b00" stroke-width="1.5"/>
+            <rect x="20" y="26" width="120" height="78" rx="2" fill="#050100" stroke="rgba(255,107,0,0.3)" stroke-width="1"/>
+            <!-- Screen -->
+            <rect class="screen-flicker" x="22" y="28" width="116" height="74" rx="1" fill="#080200"/>
+            <rect class="screen-flicker" x="22" y="28" width="116" height="74" rx="1" fill="rgba(255,107,0,0.04)"/>
+            <rect x="22" y="28" width="116" height="74" rx="1" fill="url(#screenScanlines)" opacity="0.25"/>
+            <!-- Animated code lines -->
+            <g class="code-line"><rect x="30" y="36" width="65" height="2.5" rx="1" fill="#ff6b00" opacity="0.85"/></g>
+            <g class="code-line"><rect x="30" y="44" width="48" height="2.5" rx="1" fill="#ffb347" opacity="0.75"/></g>
+            <g class="code-line"><rect x="30" y="52" width="75" height="2.5" rx="1" fill="#ff6b00" opacity="0.85"/></g>
+            <g class="code-line"><rect x="30" y="60" width="40" height="2.5" rx="1" fill="#ff2200" opacity="0.65"/></g>
+            <!-- Static dim lines -->
+            <rect x="30" y="68" width="58" height="1.5" rx="1" fill="rgba(255,107,0,0.22)"/>
+            <rect x="30" y="74" width="42" height="1.5" rx="1" fill="rgba(255,107,0,0.22)"/>
+            <rect x="30" y="80" width="68" height="1.5" rx="1" fill="rgba(255,107,0,0.22)"/>
+            <rect x="30" y="86" width="36" height="1.5" rx="1" fill="rgba(255,107,0,0.22)"/>
+            <rect x="30" y="92" width="52" height="1.5" rx="1" fill="rgba(255,107,0,0.22)"/>
+            <!-- Cursor -->
+            <rect class="cursor-blink" x="30" y="97" width="8" height="3" rx="0.5" fill="#ffb347"/>
+            <text x="100" y="99" font-family="Share Tech Mono" font-size="7" fill="rgba(255,179,71,0.35)">$_</text>
+            <!-- Power LED -->
+            <circle cx="135" cy="112" r="2.5" fill="#ff6b00"/>
+            <circle class="screen-flicker" cx="135" cy="112" r="5" fill="rgba(255,107,0,0.25)"/>
+            <!-- Disk drive -->
+            <rect x="20" y="108" width="38" height="6" rx="1" fill="#0a0300" stroke="rgba(255,107,0,0.3)" stroke-width="0.5"/>
+            <!-- Stand -->
+            <rect x="72" y="116" width="16" height="14" rx="1" fill="#0d0400" stroke="#ff6b00" stroke-width="1"/>
+            <rect x="48" y="130" width="64" height="8" rx="2" fill="#0d0400" stroke="#ff6b00" stroke-width="1.2"/>
+            <!-- Floating floppy -->
+            <g class="disk-spin" style="transform-origin: 80px 148px">
+              <rect x="68" y="138" width="24" height="21" rx="2" fill="#1a0800" stroke="#ff6b00" stroke-width="1"/>
+              <rect x="73" y="143" width="14" height="7" rx="1" fill="#0a0300" stroke="rgba(255,179,71,0.4)" stroke-width="0.5"/>
+              <rect x="79" y="140" width="4" height="4" rx="0.5" fill="#ff6b00" opacity="0.7"/>
+            </g>
+          </svg>
+        </div>
+        <span class="portal-label">Technology</span>
+        <span class="portal-desc">Professional portfolio, homelab tutorials, and tech content</span>
+      </a>
+
+    </nav>
+
+    <footer>
+      <div class="footer-line"></div>
+      <div class="social-links">
+        <a href="#" target="_blank">Spotify</a>
+        <a href="#" target="_blank">YouTube</a>
+        <a href="#" target="_blank">Instagram</a>
+        <a href="https://github.com/BryGuyBry" target="_blank">GitHub</a>
+      </div>
+      <p class="copyright">© Bryant Alama &nbsp;·&nbsp; All rights reserved</p>
+    </footer>
+  </div>
+
+  <script>
+    // ── STARFIELD ──
+    const canvas = document.getElementById('starfield');
+    const ctx = canvas.getContext('2d');
+    let stars = [];
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    function initStars() {
+      stars = [];
+      for (let i = 0; i < 220; i++) {
+        stars.push({ x: Math.random() * canvas.width, y: Math.random() * canvas.height, r: Math.random() * 1.2, twinkle: Math.random() * Math.PI * 2 });
+      }
+    }
+    function drawStars() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      stars.forEach(s => {
+        s.twinkle += 0.018;
+        const a = 0.25 + Math.sin(s.twinkle) * 0.25;
+        ctx.beginPath(); ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,179,71,${a})`; ctx.fill();
+      });
+      requestAnimationFrame(drawStars);
+    }
+    window.addEventListener('resize', () => { resize(); initStars(); });
+    resize(); initStars(); drawStars();
+
+    // ── VHS GLITCH ON LOAD ──
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.body.style.filter = 'hue-rotate(20deg) saturate(1.8) brightness(1.3)';
+        setTimeout(() => {
+          document.body.style.filter = 'none';
+          setTimeout(() => {
+            document.body.style.filter = 'hue-rotate(-15deg) brightness(1.1)';
+            setTimeout(() => { document.body.style.filter = 'none'; }, 60);
+          }, 150);
+        }, 80);
+      }, 500);
+    });
+
+    // ── GLITCH TRANSITION ──
+    const overlay = document.getElementById('glitch-overlay');
+    document.querySelectorAll('.portal').forEach(portal => {
+      portal.addEventListener('click', function(e) {
+        e.preventDefault();
+        const dest = this.getAttribute('data-dest');
+        overlay.style.transition = 'none';
+        overlay.style.opacity = '0.7'; overlay.style.background = '#ff6b00';
+        setTimeout(() => {
+          overlay.style.opacity = '0'; overlay.style.background = '#ffb347';
+          setTimeout(() => {
+            overlay.style.opacity = '0.9'; overlay.style.background = '#ff2200';
+            setTimeout(() => {
+              overlay.style.opacity = '0';
+              setTimeout(() => {
+                overlay.style.opacity = '1'; overlay.style.background = '#000';
+                setTimeout(() => { window.location.href = dest; }, 80);
+              }, 70);
+            }, 55);
+          }, 45);
+        }, 65);
+      });
+    });
+  </script>
+</body>
+</html>

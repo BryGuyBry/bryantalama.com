@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TECHNOLOGY // Bryant Alama</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --amber: #ffb347;
+      --orange: #ff6b00;
+      --red-neon: #ff2200;
+      --dim: #1a0a00;
+      --dark: #0d0500;
+      --darker: #080300;
+      --text-dim: #a05a20;
+      --glow-amber: 0 0 10px #ffb347, 0 0 30px #ff6b00, 0 0 60px #ff2200;
+      --glow-soft: 0 0 8px #ffb34788, 0 0 20px #ff6b0055;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background-color: var(--darker);
+      color: var(--amber);
+      font-family: 'Share Tech Mono', monospace;
+      min-height: 100vh;
+      position: relative;
+      cursor: crosshair;
+    }
+
+    .grid-overlay {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,179,71,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,179,71,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    .scanlines {
+      position: fixed; inset: 0; z-index: 2; pointer-events: none;
+      background: repeating-linear-gradient(to bottom, transparent, transparent 2px, rgba(0,0,0,0.18) 2px, rgba(0,0,0,0.18) 4px);
+    }
+
+    .vignette {
+      position: fixed; inset: 0; z-index: 3; pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.7) 100%);
+    }
+
+    .site-wrapper {
+      position: relative; z-index: 10;
+      max-width: 900px; margin: 0 auto;
+      padding: 3rem 2rem 4rem;
+    }
+
+    nav.topnav {
+      display: flex; align-items: center; gap: 1.5rem;
+      margin-bottom: 3rem;
+      opacity: 0; animation: fadeDown 0.8s ease forwards 0.2s;
+    }
+
+    .back-link {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 0.2em;
+      color: var(--text-dim); text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+    }
+    .back-link:hover { color: var(--amber); }
+
+    .nav-divider { color: rgba(255,107,0,0.3); font-size: 0.8rem; }
+
+    .nav-current {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.75rem; letter-spacing: 0.3em;
+      color: var(--orange);
+    }
+
+    header {
+      margin-bottom: 3rem;
+      opacity: 0; animation: fadeDown 0.8s ease forwards 0.4s;
+    }
+
+    .page-title {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 900;
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      letter-spacing: 0.3em;
+      color: var(--amber);
+      text-shadow: var(--glow-amber);
+      line-height: 1;
+    }
+
+    .page-subtitle {
+      font-size: 0.8rem; letter-spacing: 0.3em;
+      color: var(--text-dim); margin-top: 0.6rem;
+      text-transform: uppercase;
+    }
+
+    .section-line {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, var(--orange), transparent);
+      margin: 1.2rem 0 2.5rem;
+      box-shadow: 0 0 8px var(--orange);
+    }
+
+    .content-section {
+      margin-bottom: 3rem;
+      opacity: 0; animation: fadeUp 0.8s ease forwards;
+    }
+    .content-section:nth-child(1) { animation-delay: 0.6s; }
+    .content-section:nth-child(2) { animation-delay: 0.8s; }
+    .content-section:nth-child(3) { animation-delay: 1.0s; }
+
+    .section-heading {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.9rem; letter-spacing: 0.35em;
+      color: var(--orange); text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .placeholder-card {
+      border: 1px solid rgba(255,107,0,0.2);
+      padding: 1.5rem;
+      background: rgba(20,8,0,0.5);
+      margin-bottom: 1rem;
+      transition: border-color 0.3s ease;
+    }
+    .placeholder-card:hover { border-color: rgba(255,179,71,0.4); }
+
+    .placeholder-card h3 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 0.85rem; letter-spacing: 0.2em;
+      color: var(--amber); margin-bottom: 0.5rem;
+    }
+
+    .placeholder-card p {
+      font-size: 0.78rem; color: var(--text-dim);
+      line-height: 1.7; letter-spacing: 0.05em;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 0.6rem; letter-spacing: 0.2em;
+      color: var(--orange);
+      border: 1px solid rgba(255,107,0,0.4);
+      padding: 0.2rem 0.5rem;
+      margin-right: 0.4rem; margin-top: 0.6rem;
+      text-transform: uppercase;
+    }
+
+    footer {
+      margin-top: 4rem; text-align: center;
+      opacity: 0; animation: fadeUp 0.8s ease forwards 1.2s;
+    }
+
+    .footer-line {
+      width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,107,0,0.4), transparent);
+      margin-bottom: 1.2rem;
+    }
+
+    .social-links {
+      display: flex; justify-content: center;
+      gap: 2rem; margin-bottom: 0.8rem; flex-wrap: wrap;
+    }
+
+    .social-links a {
+      font-size: 0.75rem; letter-spacing: 0.2em;
+      color: var(--text-dim); text-decoration: none;
+      text-transform: uppercase;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    .social-links a:hover { color: var(--amber); text-shadow: var(--glow-soft); }
+
+    .copyright { font-size: 0.65rem; color: rgba(160,90,32,0.4); letter-spacing: 0.3em; text-transform: uppercase; }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .site-wrapper { padding: 2rem 1.2rem 3rem; }
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-overlay"></div>
+  <div class="scanlines"></div>
+  <div class="vignette"></div>
+
+  <div class="site-wrapper">
+    <nav class="topnav">
+      <a href="index.html" class="back-link">← Home</a>
+      <span class="nav-divider">//</span>
+      <span class="nav-current">TECHNOLOGY</span>
+    </nav>
+
+    <header>
+      <h1 class="page-title">TECHNOLOGY</h1>
+      <p class="page-subtitle">Professional portfolio &nbsp;·&nbsp; Homelab &nbsp;·&nbsp; Tech content</p>
+      <div class="section-line"></div>
+    </header>
+
+    <div class="content-section">
+      <h2 class="section-heading">// Latest Posts</h2>
+      <div class="placeholder-card">
+        <h3>Running Linux on a 2012 MacBook Pro</h3>
+        <p>A complete guide to installing Linux Mint 22.3 on older Apple hardware — including Wi-Fi drivers, boot issues, and breathing new life into unsupported machines.</p>
+        <span class="tag">Linux</span>
+        <span class="tag">Homelab</span>
+        <span class="tag">MacBook</span>
+      </div>
+      <div class="placeholder-card">
+        <h3>Setting Up Pi-hole on Linux Mint</h3>
+        <p>Network-wide ad blocking for every device in your home. Step by step from install to first blocked query.</p>
+        <span class="tag">Pi-hole</span>
+        <span class="tag">Networking</span>
+        <span class="tag">DNS</span>
+      </div>
+      <div class="placeholder-card">
+        <h3>Jellyfin Home Media Server</h3>
+        <p>Self-hosted media streaming with Jellyfin, NAS integration, and automatic library scanning. Your media, your server.</p>
+        <span class="tag">Jellyfin</span>
+        <span class="tag">Self-hosted</span>
+        <span class="tag">NAS</span>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2 class="section-heading">// Skills & Stack</h2>
+      <div class="placeholder-card">
+        <p>Linux Mint &nbsp;·&nbsp; Ubuntu &nbsp;·&nbsp; Bash &nbsp;·&nbsp; Git &nbsp;·&nbsp; Networking &nbsp;·&nbsp; DNS &nbsp;·&nbsp; Self-hosting &nbsp;·&nbsp; HTML/CSS &nbsp;·&nbsp; Pi-hole &nbsp;·&nbsp; Jellyfin &nbsp;·&nbsp; Tailscale &nbsp;·&nbsp; NAS Administration</p>
+      </div>
+    </div>
+
+    <div class="content-section">
+      <h2 class="section-heading">// About This Lab</h2>
+      <div class="placeholder-card">
+        <p>This is the documentation of an ongoing journey into Linux, networking, and self-hosted infrastructure. All content is written from the perspective of someone learning in real time — no gatekeeping, no assumed knowledge.</p>
+      </div>
+    </div>
+
+    <footer>
+      <div class="footer-line"></div>
+      <div class="social-links">
+        <a href="#" target="_blank">Spotify</a>
+        <a href="#" target="_blank">YouTube</a>
+        <a href="#" target="_blank">Instagram</a>
+        <a href="https://github.com/BryGuyBry" target="_blank">GitHub</a>
+      </div>
+      <p class="copyright">© Bryant Alama &nbsp;·&nbsp; All rights reserved</p>
+    </footer>
+  </div>
+</body>
+</html>
