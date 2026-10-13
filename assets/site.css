@@ -7,7 +7,6 @@
   --line: #dcd8d0;
   --card: #ffffff;
   --area: #1f5f5b;
-  --accent: var(--area);
 }
 
 .area-gis   { --area: #1f5f5b; }
@@ -39,9 +38,9 @@ body {
   font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-a { color: var(--accent); text-underline-offset: 0.15em; }
+a { color: var(--area); text-underline-offset: 0.15em; }
 
-a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+a:focus-visible { outline: 3px solid var(--area); outline-offset: 3px; }
 
 .wrap { max-width: 60rem; margin: 0 auto; padding: 0 1.25rem 3rem; }
 .narrow { max-width: 44rem; }
@@ -144,14 +143,14 @@ a.choice:focus-visible { outline: 3px solid var(--area); outline-offset: 3px; }
 .links a {
   display: inline-block;
   padding: 0.5rem 0.9rem;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--area);
   border-radius: 4px;
   font-size: 0.95rem;
   font-weight: 600;
   text-decoration: none;
 }
 
-.links a.primary { background: var(--accent); color: var(--bg); }
+.links a.primary { background: var(--area); color: var(--bg); }
 
 .roles { margin: 0; padding: 0; list-style: none; }
 .roles li { margin: 0 0 1.25rem; }
