@@ -1,0 +1,163 @@
+/* bryantalama.com: shared base. Each area sets --area; pages can restyle from there. */
+
+:root {
+  --bg: #fbfaf8;
+  --ink: #1c1f23;
+  --muted: #5b6470;
+  --line: #dcd8d0;
+  --card: #ffffff;
+  --area: #1f5f5b;
+  --accent: var(--area);
+}
+
+.area-gis   { --area: #1f5f5b; }
+.area-music { --area: #9a4a2f; }
+.area-blog  { --area: #3b4a6b; }
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #14171a;
+    --ink: #e8e6e1;
+    --muted: #a3abb5;
+    --line: #2c3238;
+    --card: #1b1f23;
+    --area: #6fc3bb;
+  }
+  .area-gis   { --area: #6fc3bb; }
+  .area-music { --area: #e0916f; }
+  .area-blog  { --area: #9db0dc; }
+}
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+a { color: var(--accent); text-underline-offset: 0.15em; }
+
+a:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+
+.wrap { max-width: 60rem; margin: 0 auto; padding: 0 1.25rem 3rem; }
+.narrow { max-width: 44rem; }
+
+/* Landing page */
+
+.masthead { padding: 4.5rem 0 2.5rem; }
+
+.masthead h1 {
+  margin: 0 0 0.6rem;
+  font-size: clamp(2.4rem, 6vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.tagline { margin: 0; font-size: 1.2rem; color: var(--muted); }
+
+.choices { display: grid; gap: 1rem; grid-template-columns: 1fr; }
+
+@media (min-width: 760px) {
+  .choices { grid-template-columns: repeat(3, 1fr); }
+}
+
+.choice {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 12rem;
+  padding: 1.5rem;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-top: 4px solid var(--area);
+  border-radius: 6px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.choice h2 { margin: 0; font-size: 1.4rem; }
+.choice p { margin: 0; color: var(--muted); font-size: 0.98rem; }
+.choice .state { margin-top: auto; padding-top: 0.75rem; font-size: 0.92rem; font-weight: 600; color: var(--area); }
+
+a.choice:hover { border-color: var(--area); box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08); }
+a.choice:focus-visible { outline: 3px solid var(--area); outline-offset: 3px; }
+
+/* Not-yet-open sections recede without dropping text below AA contrast. */
+.choice.is-soon { background: transparent; border-top-color: color-mix(in srgb, var(--area) 55%, var(--line)); }
+.choice.is-soon h2 { color: var(--muted); }
+.choice.is-soon .state { color: var(--muted); font-weight: 500; }
+
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 1.25rem;
+  margin-top: 3rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.site-footer a { padding: 0.6rem 0; white-space: nowrap; }
+
+/* Section pages */
+
+.topnav { padding: 1rem 0 0; }
+.topnav a { display: inline-block; padding: 0.5rem 0; color: var(--ink); font-weight: 600; text-decoration: none; }
+.topnav a:hover { text-decoration: underline; }
+
+.page h1 {
+  margin: 1.5rem 0 0.75rem;
+  font-size: clamp(2rem, 5vw, 2.8rem);
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+
+.lead { font-size: 1.15rem; }
+
+.page h2 {
+  margin: 2.75rem 0 0.9rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.project img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+
+.project h3 { margin: 1.1rem 0 0.4rem; font-size: 1.35rem; line-height: 1.25; }
+
+.links { display: flex; flex-wrap: wrap; gap: 0.6rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+
+.links a {
+  display: inline-block;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.links a.primary { background: var(--accent); color: var(--bg); }
+
+.roles { margin: 0; padding: 0; list-style: none; }
+.roles li { margin: 0 0 1.25rem; }
+.roles .what { font-weight: 600; }
+.roles .when { display: block; color: var(--muted); font-size: 0.92rem; }
+.roles p { margin: 0.25rem 0 0; }
+
+.plain { margin: 0; padding-left: 1.1rem; }
+.plain li { margin-bottom: 0.3rem; }
